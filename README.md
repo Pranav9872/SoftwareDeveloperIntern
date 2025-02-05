@@ -10,7 +10,7 @@ This project is a **data ingestion, visualization, and REST API application**. I
 ### **1️⃣ Clone the Repository**
 To get started, clone this repository to your local machine:
 ```bash
-git clone https://github.com/YOUR_USERNAME/SoftwareDeveloperIntern.git
+git clone https://github.com/Pranav9872/SoftwareDeveloperIntern.git
 cd SoftwareDeveloperIntern
 pip install -r requirements.txt
 uvicorn src.api:app --reload
