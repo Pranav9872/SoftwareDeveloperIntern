@@ -27,6 +27,9 @@ try:
     # ✅ Fix: Convert NaN values to 0 (or another valid value)
     merged_data.fillna(0, inplace=True)
 
+    # ✅ Debugging: Print column data types before converting to JSON
+    print("DEBUG: Column data types before JSON conversion:\n", merged_data.dtypes)
+
     # ✅ Fix: Ensure all values are JSON serializable
     merged_data = merged_data.astype(str)  # Convert all data to string to avoid JSON errors
 
@@ -45,6 +48,10 @@ def get_all_data():
     """Returns cleaned dataset as JSON."""
     if merged_data.empty:
         raise HTTPException(status_code=404, detail="🚨 No data available!")
+
+    # ✅ Debugging: Print first few rows of cleaned data before returning
+    print("DEBUG: First 5 rows of cleaned data:\n", merged_data.head())
+
     return merged_data.to_dict(orient="records")
 
 @app.get("/api/data/{file_type}")
