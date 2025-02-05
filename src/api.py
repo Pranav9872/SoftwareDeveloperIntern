@@ -24,14 +24,22 @@ try:
     # ✅ Fix: Replace invalid float values (`inf`, `-inf`) with NaN
     merged_data.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    # ✅ Fix: Convert NaN values to 0 (or another valid value)
+    # ✅ Fix: Convert NaN values to 0
     merged_data.fillna(0, inplace=True)
 
-    # ✅ Debugging: Print column data types before converting to JSON
-    print("DEBUG: Column data types before JSON conversion:\n", merged_data.dtypes)
+    # ✅ Fix: Convert all numerical columns to safe values
+    for col in merged_data.select_dtypes(include=[np.number]).columns:
+        merged_data[col] = merged_data[col].astype(float)  # Ensure all numbers are floats
+        merged_data[col] = np.where(
+            merged_data[col] > 1e308, 1e308, merged_data[col]
+        )  # Cap large numbers
+        merged_data[col] = np.where(
+            merged_data[col] < -1e308, -1e308, merged_data[col]
+        )  # Cap small numbers
 
-    # ✅ Fix: Ensure all values are JSON serializable
-    merged_data = merged_data.astype(str)  # Convert all data to string to avoid JSON errors
+    # ✅ Debugging: Print column data types and first rows
+    print("DEBUG: Column data types after cleaning:\n", merged_data.dtypes)
+    print("DEBUG: First 5 rows after cleaning:\n", merged_data.head())
 
 except Exception as e:
     raise RuntimeError(f"🚨 ERROR: Failed to load and process data: {e}")
@@ -49,10 +57,8 @@ def get_all_data():
     if merged_data.empty:
         raise HTTPException(status_code=404, detail="🚨 No data available!")
 
-    # ✅ Debugging: Print first few rows of cleaned data before returning
-    print("DEBUG: First 5 rows of cleaned data:\n", merged_data.head())
-
-    return merged_data.to_dict(orient="records")
+    # ✅ Ensure JSON-safe output
+    return merged_data.astype(str).to_dict(orient="records")
 
 @app.get("/api/data/{file_type}")
 def get_data_by_type(file_type: str):
@@ -61,4 +67,5 @@ def get_data_by_type(file_type: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
 
