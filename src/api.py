@@ -12,7 +12,7 @@ data_ingestion.read_csv("data/sample.csv")
 data_ingestion.read_json("data/sample.json")
 merged_data = data_ingestion.merge_data()
 
-# ✅ Clean the data to avoid JSON serialization errors
+# ✅ Fix: Remove NaN and Infinite Values Before Returning Data
 merged_data.replace([np.inf, -np.inf], np.nan, inplace=True)  # Replace infinite values
 merged_data.dropna(inplace=True)  # Drop NaN values
 
